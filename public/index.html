@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>管理画面 | スタンプラリー</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@700;900&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/app.css">
+<style>
+  .adm { max-width: 1040px; margin: 0 auto; padding: 0 18px 60px; }
+  .top { background: var(--base); color: #fff; padding: 16px 18px; }
+  .top .in { max-width: 1040px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .top h1 { font-size: 1.2rem; font-weight: 900; }
+  .top .who { font-size: .9rem; color: rgba(255,255,255,.85); }
+  .top button { background: transparent; color: #fff; border: 1.5px solid rgba(255,255,255,.7); border-radius: 8px; padding: 6px 12px; cursor: pointer; margin-left: 10px; }
+
+  .tabs { display: flex; gap: 6px; margin: 22px 0 18px; flex-wrap: wrap; border-bottom: 2px solid var(--line); }
+  .tabs button { background: none; border: 0; padding: 10px 16px; font-weight: 700; color: var(--muted); cursor: pointer; border-bottom: 4px solid transparent; margin-bottom: -2px; }
+  .tabs button[aria-selected=true] { color: var(--base); border-bottom-color: var(--accent); }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .stat { background: #fff; border: 1.5px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .stat b { display: block; font-family: 'Zen Kaku Gothic New', sans-serif; font-size: 1.8rem; font-weight: 900; }
+  .stat span { color: var(--muted); font-size: .85rem; }
+
+  .shops { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+  .shop { background: #fff; border: 2px solid var(--line); border-top: 8px solid var(--c); border-radius: 12px; padding: 16px; }
+  .shop .head { display: flex; align-items: center; gap: 12px; }
+  .shop .head img { width: 64px; height: 64px; object-fit: contain; border-radius: 50%; background: #f4f1e8; }
+  .shop .head input.nm { font-weight: 900; font-size: 1.1rem; border: 0; border-bottom: 2px solid var(--line); background: transparent; width: 100%; padding: 4px 0; font-family: inherit; }
+  .shop .cnt { color: var(--muted); font-size: .82rem; }
+  .field { margin-top: 12px; }
+  .field > label { display: block; font-size: .82rem; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
+  .field textarea, .field input[type=text], .field input[type=password] { width: 100%; padding: 9px 10px; border: 2px solid var(--line); border-radius: 8px; font: inherit; }
+  .field textarea { min-height: 70px; resize: vertical; }
+  .colors { display: flex; gap: 14px; }
+  .colors label { display: flex; align-items: center; gap: 8px; font-size: .85rem; font-weight: 700; }
+  .colors input[type=color] { width: 44px; height: 34px; border: 2px solid var(--line); border-radius: 8px; padding: 2px; background: #fff; cursor: pointer; }
+  .row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .b { padding: 9px 14px; border-radius: 9px; border: 2px solid var(--base); background: var(--base); color: #fff; font-weight: 700; cursor: pointer; font-size: .9rem; }
+  .b.sub { background: #fff; color: var(--base); }
+  .b.danger { background: #fff; color: #b23a48; border-color: #b23a48; }
+  .b:disabled { opacity: .5; cursor: default; }
+  .file { display: none; }
+  .shopbtns { flex-wrap: nowrap; }
+  .shopbtns .b { padding: 9px 10px; font-size: .84rem; white-space: nowrap; }
+  .shopbtns .sv { padding-left: 16px; padding-right: 16px; }
+
+  .qrs { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; }
+  .qr { background: #fff; border: 2px solid var(--line); border-radius: 12px; padding: 14px; text-align: center; }
+  .qr img.q { width: 100%; max-width: 180px; image-rendering: pixelated; }
+  .qr h3 { font-size: 1rem; margin-top: 6px; }
+  .qr .url { font-size: .7rem; color: var(--muted); word-break: break-all; margin: 4px 0 8px; }
+  .qr a.b { display: inline-block; text-decoration: none; font-size: .82rem; padding: 6px 10px; }
+
+  .panel { background: #fff; border: 2px solid var(--line); border-radius: 12px; padding: 20px; max-width: 620px; margin-bottom: 18px; }
+  .panel h2 { font-size: 1.1rem; margin-bottom: 4px; }
+  .panel p.d { color: var(--muted); font-size: .9rem; margin: 2px 0 8px; }
+
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--base); color: #fff; padding: 11px 18px; border-radius: 10px; font-weight: 700; z-index: 20; }
+  .toast.bad { background: #b23a48; }
+  .toast[hidden] { display: none; }
+  .warn { background: #fff4e0; border: 2px solid var(--accent); border-radius: 10px; padding: 12px 14px; margin-bottom: 18px; font-size: .9rem; }
+  @media print {
+    .top, .tabs, .row, .warn, .noprint { display: none !important; }
+    .qr { break-inside: avoid; border-color: #999; }
+  }
+</style>
+</head>
+<body>
+<div class="top"><div class="in">
+  <h1>スタンプラリー管理画面</h1>
+  <div><span class="who" id="who"></span><button id="logout" type="button">ログアウト</button></div>
+</div></div>
+
+<main class="adm">
+  <div class="tabs noprint" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="shops">各校の設定</button>
+    <button role="tab" aria-selected="false" data-tab="qr">QRコード</button>
+    <button role="tab" aria-selected="false" data-tab="event">全体設定</button>
+    <button role="tab" aria-selected="false" data-tab="account">アカウント</button>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <section id="tab-shops"></section>
+
+  <section id="tab-qr" hidden>
+    <div class="warn noprint" id="urlwarn" hidden></div>
+    <div class="row noprint" style="margin:0 0 16px"><button class="b" type="button" onclick="window.print()">QRコードを印刷</button></div>
+    <div class="qrs" id="qrs"></div>
+  </section>
+
+  <section id="tab-event" hidden>
+    <div class="panel">
+      <h2>ラリー全体の表示</h2>
+      <div class="field"><label for="e-title">タイトル</label><input type="text" id="e-title" maxlength="60"></div>
+      <div class="field"><label for="e-msg">案内文(トップ画面)</label><textarea id="e-msg" maxlength="200"></textarea></div>
+      <div class="field"><label for="e-done">コンプリート時のメッセージ</label><textarea id="e-done" maxlength="200"></textarea></div>
+      <div class="field colors">
+        <label>基調色 <input type="color" id="e-base"></label>
+        <label>アクセント色 <input type="color" id="e-accent"></label>
+      </div>
+      <div class="row"><button class="b" id="e-save" type="button">保存</button></div>
+    </div>
+    <div class="panel">
+      <h2>スタンプ記録のリセット</h2>
+      <p class="d">全参加者のスタンプ記録を削除します。本番前のテスト後に使います。元に戻せません。</p>
+      <div class="row"><button class="b danger" id="reset" type="button">記録をすべて削除</button></div>
+    </div>
+  </section>
+
+  <section id="tab-account" hidden>
+    <div class="panel">
+      <h2>パスワードの変更</h2>
+      <div class="field"><label for="pw-cur">現在のパスワード</label><input type="password" id="pw-cur" autocomplete="current-password"></div>
+      <div class="field"><label for="pw-new">新しいパスワード(8文字以上)</label><input type="password" id="pw-new" autocomplete="new-password"></div>
+      <div class="row"><button class="b" id="pw-save" type="button">パスワードを変更</button></div>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+let state = null;
+
+function toast(msg, bad) {
+  const t = $('#toast');
+  t.textContent = msg; t.className = 'toast' + (bad ? ' bad' : ''); t.hidden = false;
+  clearTimeout(toast._t); toast._t = setTimeout(() => (t.hidden = true), 2600);
+}
+
+async function api(url, method = 'GET', body) {
+  const res = await fetch(url, {
+    method, headers: body ? { 'Content-Type': 'application/json' } : undefined,
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (res.status === 401 && !url.includes('/login')) { location.href = '/admin/login'; throw new Error('unauth'); }
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || '処理に失敗しました。');
+  return data;
+}
+
+async function load() {
+  try {
+    const me = await api('/api/admin/me');
+    $('#who').textContent = me.username + ' としてログイン中';
+    state = await api('/api/admin/overview');
+    render();
+  } catch (e) { if (e.message !== 'unauth') toast(e.message, true); }
+}
+
+function render() {
+  $('#stats').innerHTML = '';
+  [['参加者数(1校以上)', state.visitors], ['全校コンプリート', state.completed],
+   ['参加校', state.shops.length], ['押されたスタンプ総数', state.shops.reduce((a, s) => a + s.stampCount, 0)]]
+  .forEach(([label, n]) => {
+    const d = document.createElement('div'); d.className = 'stat';
+    d.innerHTML = '<b></b><span></span>'; d.firstChild.textContent = n; d.lastChild.textContent = label;
+    $('#stats').appendChild(d);
+  });
+
+  renderShops(); renderQr();
+  const st = state.settings;
+  $('#e-title').value = st.event_title; $('#e-msg').value = st.event_message; $('#e-done').value = st.complete_message;
+  $('#e-base').value = st.base_color; $('#e-accent').value = st.accent_color;
+  document.documentElement.style.setProperty('--base', st.base_color);
+  document.documentElement.style.setProperty('--accent', st.accent_color);
+
+  const w = $('#urlwarn');
+  if (/localhost|127\.0\.0\.1/.test(state.publicUrl)) {
+    w.hidden = false;
+    w.textContent = 'QRコードの宛先が ' + state.publicUrl + ' になっています。スマートフォンからは開けません。公開するURLを環境変数 PUBLIC_URL に設定してサーバーを再起動してから、QRコードを印刷してください。';
+  } else w.hidden = true;
+}
+
+function renderShops() {
+  const box = $('#tab-shops'); box.innerHTML = '';
+  const grid = document.createElement('div'); grid.className = 'shops'; box.appendChild(grid);
+
+  state.shops.forEach((s) => {
+    const el = document.createElement('article'); el.className = 'shop'; el.style.setProperty('--c', s.color);
+    el.innerHTML = `
+      <div class="head">
+        <img alt="" class="lg">
+        <div style="flex:1;min-width:0">
+          <input class="nm" aria-label="学校名" maxlength="30">
+          <div class="cnt"></div>
+        </div>
+      </div>
+      <div class="field colors">
+        <label>メイン色 <input type="color" class="c1"></label>
+        <label>アクセント色 <input type="color" class="c2"></label>
+      </div>
+      <div class="field"><label>スタンプ取得時のコメント</label><textarea class="cm" maxlength="200"></textarea></div>
+      <div class="row shopbtns">
+        <button class="b sv" type="button">保存</button>
+        <button class="b sub up" type="button">ロゴを登録</button>
+        <button class="b sub rs" type="button">自動ロゴに戻す</button>
+      </div>
+      <input type="file" class="file" accept="image/png,image/jpeg,image/webp,image/svg+xml">`;
+    $('.lg', el).src = s.logo + '?t=' + Date.now();
+    $('.nm', el).value = s.name;
+    $('.cnt', el).textContent = 'スタンプ ' + s.stampCount + ' 件';
+    $('.c1', el).value = s.color; $('.c2', el).value = s.accent; $('.cm', el).value = s.comment;
+
+    $('.c1', el).addEventListener('input', (e) => el.style.setProperty('--c', e.target.value));
+    $('.sv', el).addEventListener('click', async () => {
+      try {
+        await api('/api/admin/shops/' + s.id, 'PUT', {
+          name: $('.nm', el).value, color: $('.c1', el).value, accent: $('.c2', el).value, comment: $('.cm', el).value,
+        });
+        toast(s.name + ' の設定を保存しました'); await load();
+      } catch (e) { toast(e.message, true); }
+    });
+
+    const file = $('.file', el);
+    $('.up', el).addEventListener('click', () => file.click());
+    file.addEventListener('change', () => {
+      const f = file.files[0]; if (!f) return;
+      if (f.size > 2 * 1024 * 1024) return toast('ファイルサイズは2MB以下にしてください', true);
+      const r = new FileReader();
+      r.onload = async () => {
+        try { await api('/api/admin/shops/' + s.id + '/logo', 'POST', { dataUrl: r.result }); toast('ロゴを登録しました'); await load(); }
+        catch (e) { toast(e.message, true); }
+      };
+      r.readAsDataURL(f);
+    });
+    $('.rs', el).addEventListener('click', async () => {
+      try { await api('/api/admin/shops/' + s.id + '/logo', 'DELETE'); toast('自動生成のロゴに戻しました'); await load(); }
+      catch (e) { toast(e.message, true); }
+    });
+    grid.appendChild(el);
+  });
+}
+
+function renderQr() {
+  const box = $('#qrs'); box.innerHTML = '';
+  // 参加者向け入口のQR
+  const entry = document.createElement('div'); entry.className = 'qr';
+  entry.innerHTML = '<img class="q" alt="アプリ入口のQRコード"><h3>台紙(入口)</h3><div class="url"></div><a class="b sub noprint" download="qr-entry.png">PNGを保存</a>';
+  $('img', entry).src = '/api/qr/app.png?size=600'; $('.url', entry).textContent = state.publicUrl + '/';
+  $('a', entry).href = '/api/qr/app.png?size=1200'; box.appendChild(entry);
+
+  state.shops.forEach((s) => {
+    const d = document.createElement('div'); d.className = 'qr';
+    d.innerHTML = '<img class="q" alt=""><h3></h3><div class="url"></div><div class="noprint"><a class="b sub" download>PNGを保存</a> <button class="b danger" type="button" style="font-size:.82rem;padding:6px 10px">QRを再発行</button></div>';
+    const q = $('img.q', d); q.src = '/api/admin/qr/' + s.id + '.png?size=600&t=' + Date.now(); q.alt = s.name + 'のQRコード';
+    $('h3', d).textContent = s.name; $('.url', d).textContent = s.scanUrl;
+    const a = $('a', d); a.href = '/api/admin/qr/' + s.id + '.png?size=1200'; a.download = 'qr-' + s.slug + '.png';
+    $('button', d).addEventListener('click', async () => {
+      if (!confirm(s.name + ' のQRコードを再発行します。印刷済みの古いQRコードは使えなくなります。よろしいですか?')) return;
+      try { await api('/api/admin/shops/' + s.id + '/regenerate-token', 'POST'); toast('QRコードを再発行しました'); await load(); }
+      catch (e) { toast(e.message, true); }
+    });
+    box.appendChild(d);
+  });
+}
+
+document.querySelectorAll('.tabs button').forEach((b) => b.addEventListener('click', () => {
+  document.querySelectorAll('.tabs button').forEach((x) => x.setAttribute('aria-selected', x === b));
+  ['shops', 'qr', 'event', 'account'].forEach((t) => ($('#tab-' + t).hidden = t !== b.dataset.tab));
+}));
+
+$('#e-save').addEventListener('click', async () => {
+  try {
+    await api('/api/admin/settings', 'PUT', {
+      title: $('#e-title').value, message: $('#e-msg').value, completeMessage: $('#e-done').value,
+      baseColor: $('#e-base').value, accentColor: $('#e-accent').value,
+    });
+    toast('全体設定を保存しました'); await load();
+  } catch (e) { toast(e.message, true); }
+});
+
+$('#reset').addEventListener('click', async () => {
+  if (!confirm('全参加者のスタンプ記録を削除します。元に戻せません。よろしいですか?')) return;
+  try { await api('/api/admin/reset-stamps', 'POST', { confirm: 'RESET' }); toast('スタンプ記録を削除しました'); await load(); }
+  catch (e) { toast(e.message, true); }
+});
+
+$('#pw-save').addEventListener('click', async () => {
+  try {
+    await api('/api/admin/password', 'POST', { current: $('#pw-cur').value, next: $('#pw-new').value });
+    $('#pw-cur').value = ''; $('#pw-new').value = ''; toast('パスワードを変更しました');
+  } catch (e) { toast(e.message, true); }
+});
+
+$('#logout').addEventListener('click', async () => { await api('/api/admin/logout', 'POST'); location.href = '/admin/login'; });
+
+load();
+</script>
+</body>
+</html>
