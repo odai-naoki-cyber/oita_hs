@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>スタンプを押しています</title>
+<meta name="theme-color" content="#14213D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@700;900&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/app.css">
+</head>
+<body>
+<main class="wrap" id="root" aria-live="polite">
+  <div class="loading">スタンプを押しています…</div>
+</main>
+
+<script>
+(async function () {
+  const root = document.getElementById('root');
+  const token = location.pathname.split('/').filter(Boolean).pop();
+
+  function showError(msg) {
+    root.innerHTML = '';
+    const box = document.createElement('div');
+    box.className = 'err';
+    box.innerHTML = '<h2>スタンプを押せませんでした</h2>';
+    const p = document.createElement('p');
+    p.textContent = msg;
+    box.appendChild(p);
+    const a = document.createElement('a');
+    a.className = 'btn ghost'; a.href = '/'; a.textContent = '台紙を見る';
+    root.appendChild(box); root.appendChild(a);
+  }
+
+  try {
+    const [ev, res] = await Promise.all([
+      fetch('/api/event').then((r) => r.json()),
+      fetch('/api/stamp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      }),
+    ]);
+    const data = await res.json();
+    if (!res.ok) return showError(data.error || '通信に失敗しました。');
+
+    document.documentElement.style.setProperty('--base', data.shop.color);
+    document.documentElement.style.setProperty('--accent', data.shop.accent);
+    document.querySelector('meta[name=theme-color]').content = data.shop.color;
+    document.title = data.shop.name + 'のスタンプ';
+
+    root.innerHTML = '';
+    const hero = document.createElement('section');
+    hero.className = 'stamp-hero';
+    hero.style.setProperty('--c', data.shop.color);
+
+    const img = document.createElement('img');
+    img.className = 'logo'; img.src = data.shop.logo; img.alt = data.shop.name + 'のロゴ';
+    const h = document.createElement('h2');
+    h.textContent = data.isNew ? data.shop.name + 'のスタンプを押しました' : data.shop.name + 'のスタンプは押し済みです';
+    const st = document.createElement('p');
+    st.className = 'status';
+    st.textContent = data.collected + ' / ' + data.total + ' 校';
+
+    hero.appendChild(img); hero.appendChild(h); hero.appendChild(st);
+
+    if (data.shop.comment) {
+      const c = document.createElement('p');
+      c.className = 'comment'; c.textContent = data.shop.comment;
+      hero.appendChild(c);
+    }
+    root.appendChild(hero);
+
+    if (data.complete) {
+      const c = document.createElement('div');
+      c.className = 'complete';
+      c.innerHTML = '<strong>全校コンプリート</strong>';
+      const s = document.createElement('span'); s.textContent = ev.completeMessage;
+      c.appendChild(s);
+      root.appendChild(c);
+    }
+
+    const a = document.createElement('a');
+    a.className = 'btn'; a.href = '/?new=' + data.shop.id;
+    a.textContent = '台紙を見る';
+    root.appendChild(a);
+  } catch (e) {
+    showError('通信に失敗しました。電波の良い場所でもう一度QRコードを読み取ってください。');
+  }
+})();
+</script>
+</body>
+</html>
