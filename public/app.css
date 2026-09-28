@@ -1,0 +1,112 @@
+:root {
+  --base: #14213D;
+  --accent: #F28C28;
+  --paper: #FAF8F3;
+  --ink: #1d2433;
+  --muted: #5d6677;
+  --line: #e4dfd2;
+  --radius: 14px;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Yu Gothic', 'Meiryo', sans-serif;
+  line-height: 1.7;
+  min-height: 100vh;
+}
+h1, h2, h3 { font-family: 'Zen Kaku Gothic New', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif; line-height: 1.35; margin: 0; }
+button { font: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.wrap { max-width: 560px; margin: 0 auto; padding: 0 18px 48px; }
+
+/* ヘッダー */
+.masthead { background: var(--base); color: #fff; padding: 28px 18px 26px; }
+.masthead .wrap { padding-bottom: 0; }
+.masthead h1 { font-size: clamp(1.45rem, 6vw, 1.9rem); font-weight: 900; letter-spacing: .02em; }
+.masthead p { margin: 8px 0 0; color: rgba(255,255,255,.82); font-size: .95rem; }
+
+/* 進捗 */
+.progress { display: flex; align-items: center; gap: 12px; margin: 22px 0 6px; }
+.progress .count { font-family: 'Zen Kaku Gothic New', sans-serif; font-weight: 900; font-size: 1.5rem; white-space: nowrap; }
+.progress .count small { font-size: .85rem; font-weight: 700; color: var(--muted); margin-left: 2px; }
+.bar { flex: 1; height: 10px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.bar > i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 99px; transition: width .5s ease; }
+
+/* 台紙 */
+.card-sheet {
+  margin-top: 18px;
+  background: #fff;
+  border: 2px solid var(--base);
+  border-radius: var(--radius);
+  padding: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.slot {
+  aspect-ratio: 1;
+  border-radius: 12px;
+  border: 2px dashed var(--line);
+  background: repeating-linear-gradient(45deg, #fbfaf6, #fbfaf6 6px, #f4f1e8 6px, #f4f1e8 12px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 6px; text-align: center; position: relative;
+}
+.slot .nm { font-size: .72rem; color: var(--muted); font-weight: 700; margin-top: 4px; }
+.slot .ph { width: 44%; aspect-ratio: 1; border-radius: 50%; border: 2px solid var(--line); }
+.slot.got { border: 2px solid var(--c, var(--base)); background: #fff; }
+.slot.got img { width: 66%; aspect-ratio: 1; object-fit: contain; display: block; }
+.slot.got .nm { color: var(--ink); }
+.slot.got::after {
+  content: '済'; position: absolute; top: 4px; right: 6px;
+  font-size: .68rem; font-weight: 900; color: #fff; background: var(--c, var(--base));
+  border-radius: 99px; padding: 0 6px; line-height: 1.5;
+}
+.slot.pressing img { animation: press .55s cubic-bezier(.2,.9,.3,1.2); }
+@keyframes press {
+  0%   { transform: scale(1.9) rotate(-8deg); opacity: 0; }
+  55%  { transform: scale(.88) rotate(2deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); }
+}
+
+.note { color: var(--muted); font-size: .88rem; margin: 18px 2px 0; }
+
+/* 取得画面 */
+.stamp-hero { text-align: center; padding: 34px 0 10px; }
+.stamp-hero .logo {
+  width: min(58vw, 240px); aspect-ratio: 1; margin: 0 auto; display: block; object-fit: contain;
+  animation: press .7s cubic-bezier(.2,.9,.3,1.2);
+}
+.stamp-hero h2 { font-size: 1.35rem; margin-top: 22px; font-weight: 900; text-wrap: balance; word-break: auto-phrase; overflow-wrap: anywhere; }
+.stamp-hero .status { margin: 6px 0 0; color: var(--muted); }
+.comment {
+  margin: 22px 0 0; padding: 16px 18px 16px 24px; background: #fff;
+  border: 1.5px solid var(--line); border-radius: 10px; font-size: 1rem;
+  box-shadow: inset 6px 0 0 var(--c, var(--base)); text-align: left; text-wrap: balance; word-break: auto-phrase; overflow-wrap: anywhere;
+}
+.complete {
+  margin-top: 22px; padding: 18px; border-radius: var(--radius);
+  background: var(--base); color: #fff; text-align: center; font-weight: 700;
+}
+.complete strong { display: block; font-size: 1.25rem; margin-bottom: 4px; }
+
+.btn {
+  display: block; width: 100%; text-align: center; text-decoration: none; cursor: pointer;
+  background: var(--base); color: #fff; border: 0; border-radius: 12px;
+  padding: 15px 18px; font-weight: 700; font-size: 1rem; margin-top: 22px;
+}
+.btn.ghost { background: transparent; color: var(--base); border: 2px solid var(--base); }
+
+.err { margin-top: 40px; padding: 18px; background: #fff; border: 2px solid #b23a48; border-radius: 12px; }
+.err h2 { color: #b23a48; font-size: 1.15rem; }
+.err p { margin: 8px 0 0; }
+
+.loading { text-align: center; color: var(--muted); padding: 60px 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .slot.pressing img, .stamp-hero .logo { animation: none; }
+  .bar > i { transition: none; }
+}
