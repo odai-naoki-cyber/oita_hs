@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>スタンプラリー</title>
+<meta name="theme-color" content="#14213D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@700;900&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/app.css">
+</head>
+<body>
+<header class="masthead">
+  <div class="wrap">
+    <h1 id="title">スタンプラリー</h1>
+    <p id="message"></p>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="progress" aria-live="polite">
+    <div class="count"><span id="have">0</span><small>/ <span id="total">9</span> 校</small></div>
+    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="9" aria-valuenow="0"><i id="fill"></i></div>
+  </div>
+
+  <div id="complete" class="complete" hidden></div>
+
+  <section class="card-sheet" id="sheet" aria-label="スタンプ台紙"></section>
+
+  <p class="note">各校に掲示されたQRコードをスマートフォンのカメラで読み取ると、その学校のスタンプがここに押されます。アプリのインストールは不要です。</p>
+</main>
+
+<script>
+(async function () {
+  const $ = (id) => document.getElementById(id);
+  const [ev, me] = await Promise.all([
+    fetch('/api/event').then((r) => r.json()),
+    fetch('/api/me').then((r) => r.json()),
+  ]);
+
+  document.documentElement.style.setProperty('--base', ev.baseColor);
+  document.documentElement.style.setProperty('--accent', ev.accentColor);
+  document.querySelector('meta[name=theme-color]').content = ev.baseColor;
+  document.title = ev.title;
+  $('title').textContent = ev.title;
+  $('message').textContent = ev.message;
+
+  const got = new Set(me.stamps.map((s) => s.shopId));
+  const just = new URLSearchParams(location.search).get('new'); // 取得直後の演出用
+
+  const sheet = $('sheet');
+  ev.shops.forEach((s) => {
+    const d = document.createElement('div');
+    d.className = 'slot';
+    if (got.has(s.id)) {
+      d.classList.add('got');
+      d.style.setProperty('--c', s.color);
+      if (just && String(s.id) === just) d.classList.add('pressing');
+      const img = document.createElement('img');
+      img.src = s.logo; img.alt = s.name + 'のスタンプ';
+      d.appendChild(img);
+    } else {
+      d.innerHTML = '<div class="ph"></div>';
+    }
+    const nm = document.createElement('div');
+    nm.className = 'nm'; nm.textContent = s.name;
+    d.appendChild(nm);
+    sheet.appendChild(d);
+  });
+
+  const total = ev.shops.length;
+  const have = got.size;
+  $('have').textContent = have;
+  $('total').textContent = total;
+  const bar = document.querySelector('.bar');
+  bar.setAttribute('aria-valuemax', total);
+  bar.setAttribute('aria-valuenow', have);
+  requestAnimationFrame(() => { $('fill').style.width = (total ? have / total * 100 : 0) + '%'; });
+
+  if (have >= total && total > 0) {
+    const c = $('complete');
+    c.hidden = false;
+    c.innerHTML = '<strong>全校コンプリート</strong>';
+    const p = document.createElement('span');
+    p.textContent = ev.completeMessage;
+    c.appendChild(p);
+  }
+})();
+</script>
+</body>
+</html>
