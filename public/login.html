@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>管理者ログイン</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@700;900&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/app.css">
+<style>
+  body { display: grid; place-items: center; padding: 20px; }
+  .login { width: 100%; max-width: 380px; background: #fff; border: 2px solid var(--base); border-radius: var(--radius); padding: 28px 24px; }
+  .login h1 { font-size: 1.35rem; font-weight: 900; }
+  .login p.sub { color: var(--muted); margin: 6px 0 22px; font-size: .92rem; }
+  label { display: block; font-weight: 700; font-size: .92rem; margin-top: 14px; }
+  input { width: 100%; margin-top: 6px; padding: 12px 12px; border: 2px solid var(--line); border-radius: 10px; font: inherit; background: #fff; }
+  input:focus { border-color: var(--base); outline: none; box-shadow: 0 0 0 3px rgba(242,140,40,.35); }
+  .msg { min-height: 1.5em; margin-top: 14px; color: #b23a48; font-weight: 700; font-size: .92rem; }
+  .btn { margin-top: 8px; }
+</style>
+</head>
+<body>
+<form class="login" id="f">
+  <h1>管理者ログイン</h1>
+  <p class="sub">スタンプラリーの設定を変更します。</p>
+  <label for="u">ユーザー名</label>
+  <input id="u" name="username" autocomplete="username" required autofocus>
+  <label for="p">パスワード</label>
+  <input id="p" name="password" type="password" autocomplete="current-password" required>
+  <div class="msg" id="msg" role="alert"></div>
+  <button class="btn" type="submit">ログイン</button>
+</form>
+<script>
+document.getElementById('f').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById('msg');
+  msg.textContent = '';
+  const res = await fetch('/api/admin/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: document.getElementById('u').value, password: document.getElementById('p').value }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (res.ok) location.href = '/admin';
+  else msg.textContent = data.error || 'ログインできませんでした。';
+});
+</script>
+</body>
+</html>
