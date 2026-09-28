@@ -1,0 +1,19 @@
+{
+  "name": "oita-highschool-stamp-rally",
+  "version": "1.0.0",
+  "description": "大分県 高校スタンプラリー(QRコード式Webアプリ)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning server.js"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "express": "^5.2.1",
+    "qrcode": "^1.5.4"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "private": true
+}
